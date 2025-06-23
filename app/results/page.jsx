@@ -8,6 +8,9 @@ import { Brain, Download, BarChart3 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { questions } from '../data/questions';
 
+// Force client-side rendering to avoid useSearchParams error during prerendering
+export const dynamic = 'force-dynamic';
+
 // Simulated normative data (mean and SD for raw scores and time)
 const NORMATIVE_DATA = {
     meanScore: 20,
