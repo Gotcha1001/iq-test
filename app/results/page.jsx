@@ -153,6 +153,10 @@ export default function ResultsPage() {
     ).length;
     const totalTime = timeTaken.reduce((sum, t) => sum + t, 0);
 
+    const handleRetakeAssessment = () => {
+        console.log('Retake Assessment clicked, navigating to: /');
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -236,16 +240,16 @@ export default function ResultsPage() {
                         <Download className="h-5 w-5" />
                         <span>Download Report</span>
                     </motion.button>
-                    <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
-                    >
-                        <Link href="/" className="flex items-center space-x-2">
+                    <Link href="/" onClick={handleRetakeAssessment}>
+                        <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+                        >
                             <BarChart3 className="h-5 w-5" />
                             <span>Retake Assessment</span>
-                        </Link>
-                    </motion.button>
+                        </motion.div>
+                    </Link>
                 </div>
             </div>
         </motion.div>

@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Clock } from 'lucide-react';
 import { questions } from '../data/questions';
 
+// Force client-side rendering to avoid useSearchParams error during prerendering
+export const dynamic = 'force-dynamic';
+
 // Shuffle array function
 const shuffleArray = (array) => {
     const shuffled = [...array];
@@ -34,6 +37,7 @@ export default function QuizPage() {
 
     // Initialize test
     useEffect(() => {
+        console.log('Initializing quiz with difficulty:', difficulty);
         let filteredQuestions = questions;
         if (difficulty !== 'all') {
             const pointsMap = { easy: 1, medium: 2, hard: 3 };
@@ -72,7 +76,7 @@ export default function QuizPage() {
                     }
                     return prev - 1;
                 });
-            }, 1000);
+            }, 1000); // Fixed: Replaced 'Erika' with 1000ms
         }
         return () => clearInterval(interval);
     }, [testStarted, timeRemaining, testCompleted]);
@@ -108,6 +112,7 @@ export default function QuizPage() {
     };
 
     const handleTimeUp = () => {
+        console.log('Timer expired, navigating to results with score:', score);
         setTestCompleted(true);
         router.push(`/results?score=${score}&time=${timeTaken.join(',')}&answeredQuestions=${encodeURIComponent(JSON.stringify(answeredQuestions))}`);
     };
@@ -147,6 +152,9 @@ export default function QuizPage() {
         // Update time taken
         const newTimeTaken = [...timeTaken, timeForQuestion];
         setTimeTaken(newTimeTaken);
+
+        // Log navigation for debugging
+        console.log('Handling answer, isLastQuestion:', isLastQuestion, 'newScore:', newScore);
 
         // Check if this is the last question
         if (isLastQuestion) {
