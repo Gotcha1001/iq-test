@@ -265,11 +265,25 @@
 
 import { Suspense } from 'react';
 import ResultsContent from './ResultsContent';
+import { Brain } from 'lucide-react';
 
+// Add this to prevent static generation
+export const dynamic = 'force-dynamic';
+
+function LoadingFallback() {
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center text-white">
+            <div className="text-center">
+                <Brain className="mx-auto mb-4 h-16 w-16 text-cyan-400 animate-pulse" />
+                <p>Loading your results...</p>
+            </div>
+        </div>
+    );
+}
 
 export default function ResultsPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-indigo-950 flex items-center justify-center text-white">Loading results...</div>}>
+        <Suspense fallback={<LoadingFallback />}>
             <ResultsContent />
         </Suspense>
     );

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Brain, Download, BarChart3 } from "lucide-react";
 import jsPDF from "jspdf";
 import { questions } from "../data/questions";
+import { useEffect, useState } from "react";
 
 // Force client-side rendering
 export const dynamic = "force-dynamic";
@@ -196,20 +197,43 @@ const generatePDFReport = (
 
 export default function ResultsContent() {
   const searchParams = useSearchParams();
-  const score = parseInt(searchParams.get("score")) || 0;
-  const timeTaken = (searchParams.get("time") || "")
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client side before accessing search params
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Don't render anything until we're on the client
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center text-white">
+        <div className="text-center">
+          <Brain className="mx-auto mb-4 h-16 w-16 text-cyan-400 animate-pulse" />
+          <p>Loading your results...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Safely parse search params with defaults
+  const score = parseInt(searchParams?.get("score") || "0") || 0;
+  const timeTaken = (searchParams?.get("time") || "")
     .split(",")
     .map(Number)
     .filter((t) => !isNaN(t));
+
   let answeredQuestions = [];
   try {
-    answeredQuestions = JSON.parse(
-      decodeURIComponent(searchParams.get("answeredQuestions") || "[]")
-    );
+    const questionsParam = searchParams?.get("answeredQuestions");
+    if (questionsParam) {
+      answeredQuestions = JSON.parse(decodeURIComponent(questionsParam));
+    }
   } catch (e) {
     console.error("Error parsing answeredQuestions:", e);
     answeredQuestions = [];
   }
+
   const totalQuestions = 20;
 
   // Ensure timeTaken and answeredQuestions are aligned (truncate to 20 if necessary)
