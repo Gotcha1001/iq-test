@@ -263,18 +263,45 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, Component } from 'react';
 import ResultsContent from './ResultsContent';
 import { Brain } from 'lucide-react';
+import Link from 'next/link';
 
-// Add this to prevent static generation
+// Force client-side rendering
 export const dynamic = 'force-dynamic';
+
+class ErrorBoundary extends Component {
+    state = { hasError: false };
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="min-h-screen bg-indigo-950 flex items-center justify-center text-white">
+                    <div className="text-center">
+                        <p className="text-red-400">Error: Unable to display results. Please retake the assessment.</p>
+                        <Link href="/" className="mt-4 inline-block bg-indigo-600 px-4 py-2 rounded">
+                            Return to Home
+                        </Link>
+                    </div>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 function LoadingFallback() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center text-white">
+        <div
+            className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex items-center justify-center text-white"
+            role="status"
+            aria-live="polite"
+        >
             <div className="text-center">
-                <Brain className="mx-auto mb-4 h-16 w-16 text-cyan-400 animate-pulse" />
+                <Brain className="mx-auto mb-4 h-16 w-16 text-cyan-400 animate-pulse" aria-hidden="true" />
                 <p>Loading your results...</p>
             </div>
         </div>
@@ -284,7 +311,9 @@ function LoadingFallback() {
 export default function ResultsPage() {
     return (
         <Suspense fallback={<LoadingFallback />}>
-            <ResultsContent />
+            <ErrorBoundary>
+                <ResultsContent />
+            </ErrorBoundary>
         </Suspense>
     );
 }
